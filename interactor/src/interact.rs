@@ -159,7 +159,7 @@ impl ContractInteract {
             .tx()
             .from(&self.proposer_address)
             .to(self.state.current_address())
-            .gas(30_000_000u64)
+            .gas(5_000_000u64)
             .typed(proxy::XBountyProxy)
             .fund(repo_url, issue_id)
             .egld(egld_amount)

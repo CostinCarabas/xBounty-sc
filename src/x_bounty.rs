@@ -45,7 +45,7 @@ pub trait XBounty: events::EventsModule + storage::StorageModule {
         bounties_mapper.set(&bounty);
 
         // Emit event for funding
-        self.fund_event(issue_id, payment_amount, caller);
+        self.fund_event(repo_url, issue_id, payment_amount, caller);
     }
 
     #[endpoint]
@@ -67,7 +67,7 @@ pub trait XBounty: events::EventsModule + storage::StorageModule {
         bounties_mapper.set(&bounty);
 
         // Emit event for claim
-        self.claim_event(issue_id, caller);
+        self.claim_event(repo_url, issue_id, caller);
     }
 
     #[endpoint(releaseBounty)]
@@ -99,7 +99,7 @@ pub trait XBounty: events::EventsModule + storage::StorageModule {
         bounties_mapper.set(&updated_bounty);
 
         // Emit event for completion
-        self.complete_event(issue_id, solver, bounty.amount);
+        self.complete_event(repo_url, issue_id, solver, bounty.amount);
     }
 
     // Views
