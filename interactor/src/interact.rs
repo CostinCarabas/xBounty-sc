@@ -150,8 +150,9 @@ impl ContractInteract {
     pub async fn fund(&mut self) {
         let egld_amount = BigUint::<StaticApi>::from(10u128).pow(18);
 
-        let repo_url = ManagedBuffer::new_from_bytes(&b""[..]);
-        let issue_id = 0u64;
+        let repo_url =
+            ManagedBuffer::from("https://github.com/multiversx/mx-contracts-rs/issues/131");
+        let issue_id = 1u64;
 
         let response = self
             .interactor

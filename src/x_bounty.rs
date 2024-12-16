@@ -22,6 +22,13 @@ pub trait XBounty: events::EventsModule + storage::StorageModule {
         let payment_amount = self.call_value().egld_value().clone_value();
         require!(payment_amount > 0, "Payment amount must be greater than 0");
 
+        let bounties_mapper = self.bounties(&repo_url, &issue_id);
+
+        require!(
+            bounties_mapper.is_empty(),
+            "Bounty already exists for this issue"
+        );
+
         let caller = self.blockchain().get_caller();
         let current_timestamp = self.blockchain().get_block_timestamp();
 
@@ -35,12 +42,7 @@ pub trait XBounty: events::EventsModule + storage::StorageModule {
             created_at: current_timestamp,
         };
 
-        require!(
-            self.bounties(&repo_url, &issue_id).is_empty(),
-            "Bounty already exists for this issue"
-        );
-
-        self.bounties(&repo_url, &issue_id).set(&bounty);
+        bounties_mapper.set(&bounty);
 
         // Emit event for funding
         self.fund_event(issue_id, payment_amount, caller);
@@ -49,12 +51,10 @@ pub trait XBounty: events::EventsModule + storage::StorageModule {
     #[endpoint]
     fn claim(&self, repo_url: ManagedBuffer, issue_id: u64) {
         let caller = self.blockchain().get_caller();
-        require!(
-            !self.bounties(&repo_url, &issue_id).is_empty(),
-            "Bounty does not exist"
-        );
+        let bounties_mapper = self.bounties(&repo_url, &issue_id);
+        require!(!bounties_mapper.is_empty(), "Bounty does not exist");
 
-        let mut bounty = self.bounties(&repo_url, &issue_id).get();
+        let mut bounty = bounties_mapper.get();
         require!(
             bounty.status == BountyStatus::Funded,
             "Bounty is not in funded status"
@@ -64,7 +64,7 @@ pub trait XBounty: events::EventsModule + storage::StorageModule {
         bounty.solver = Some(caller.clone());
         bounty.status = BountyStatus::Claimed;
 
-        self.bounties(&repo_url, &issue_id).set(&bounty);
+        bounties_mapper.set(&bounty);
 
         // Emit event for claim
         self.claim_event(issue_id, caller);
@@ -72,17 +72,16 @@ pub trait XBounty: events::EventsModule + storage::StorageModule {
 
     #[endpoint(releaseBounty)]
     fn release_bounty(&self, repo_url: ManagedBuffer, issue_id: u64) {
-        let caller = self.blockchain().get_caller();
-        require!(
-            !self.bounties(&repo_url, &issue_id).is_empty(),
-            "Bounty does not exist"
-        );
+        let bounties_mapper = self.bounties(&repo_url, &issue_id);
+        require!(!bounties_mapper.is_empty(), "Bounty does not exist");
 
-        let bounty = self.bounties(&repo_url, &issue_id).get();
+        let bounty = bounties_mapper.get();
         require!(
             bounty.status == BountyStatus::Claimed,
             "Bounty is not in claimed status"
         );
+
+        let caller = self.blockchain().get_caller();
         require!(
             bounty.proposer == caller,
             "Only proposer can release the bounty"
@@ -97,11 +96,13 @@ pub trait XBounty: events::EventsModule + storage::StorageModule {
         // Update status
         let mut updated_bounty = bounty.clone();
         updated_bounty.status = BountyStatus::Completed;
-        self.bounties(&repo_url, &issue_id).set(&updated_bounty);
+        bounties_mapper.set(&updated_bounty);
 
         // Emit event for completion
         self.complete_event(issue_id, solver, bounty.amount);
     }
+
+    // Views
 
     #[view(getBounty)]
     fn get_bounty(&self, repo_url: ManagedBuffer, issue_id: u64) -> Option<Bounty<Self::Api>> {
