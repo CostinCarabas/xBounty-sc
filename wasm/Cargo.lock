@@ -184,16 +184,16 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "151ac09978d3c2862c4e39b557f4eceee2cc72150bc4cb4f16abf061b6e381fb"
 
 [[package]]
-name = "x-bounty"
+name = "x_bounty"
 version = "0.0.0"
 dependencies = [
  "multiversx-sc",
 ]
 
 [[package]]
-name = "x-bounty-wasm"
+name = "x_bounty-wasm"
 version = "0.0.0"
 dependencies = [
  "multiversx-sc-wasm-adapter",
- "x-bounty",
+ "x_bounty",
 ]

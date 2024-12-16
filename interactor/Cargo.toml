@@ -1,18 +1,18 @@
 [package]
-name = "x-bounty-interact"
+name = "rust-interact"
 version = "0.0.0"
 authors = ["you"]
 edition = "2021"
 publish = false
 
 [[bin]]
-name = "x-bounty-interact"
+name = "rust-interact"
 path = "src/interactor_main.rs"
 
 [lib]
 path = "src/interact.rs"
 
-[dependencies.x-bounty]
+[dependencies.x_bounty]
 path = ".."
 
 [dependencies.multiversx-sc-snippets]

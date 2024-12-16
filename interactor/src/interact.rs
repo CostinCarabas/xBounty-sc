@@ -74,7 +74,8 @@ impl Drop for State {
 
 pub struct ContractInteract {
     interactor: Interactor,
-    wallet_address: Address,
+    proposer_address: Address,
+    solver_address: Address,
     contract_code: BytesValue,
     state: State,
 }
@@ -87,7 +88,8 @@ impl ContractInteract {
             .use_chain_simulator(config.use_chain_simulator());
 
         interactor.set_current_dir_from_workspace("x_bounty");
-        let wallet_address = interactor.register_wallet(test_wallets::alice()).await;
+        let proposer_address = interactor.register_wallet(test_wallets::alice()).await;
+        let solver_address = interactor.register_wallet(test_wallets::bob()).await;
 
         // Useful in the chain simulator setting
         // generate blocks until ESDTSystemSCAddress is enabled
@@ -100,7 +102,8 @@ impl ContractInteract {
 
         ContractInteract {
             interactor,
-            wallet_address,
+            proposer_address,
+            solver_address,
             contract_code,
             state: State::load_state(),
         }
@@ -110,7 +113,7 @@ impl ContractInteract {
         let new_address = self
             .interactor
             .tx()
-            .from(&self.wallet_address)
+            .from(&self.proposer_address)
             .gas(30_000_000u64)
             .typed(proxy::XBountyProxy)
             .init()
@@ -131,7 +134,7 @@ impl ContractInteract {
             .interactor
             .tx()
             .to(self.state.current_address())
-            .from(&self.wallet_address)
+            .from(&self.proposer_address)
             .gas(30_000_000u64)
             .typed(proxy::XBountyProxy)
             .upgrade()
@@ -145,14 +148,14 @@ impl ContractInteract {
     }
 
     pub async fn fund(&mut self) {
-        let egld_amount = BigUint::<StaticApi>::from(0u128);
+        let egld_amount = BigUint::<StaticApi>::from(10u128).pow(18);
 
         let issue_id = 0u64;
 
         let response = self
             .interactor
             .tx()
-            .from(&self.wallet_address)
+            .from(&self.proposer_address)
             .to(self.state.current_address())
             .gas(30_000_000u64)
             .typed(proxy::XBountyProxy)
@@ -171,7 +174,7 @@ impl ContractInteract {
         let response = self
             .interactor
             .tx()
-            .from(&self.wallet_address)
+            .from(&self.solver_address)
             .to(self.state.current_address())
             .gas(30_000_000u64)
             .typed(proxy::XBountyProxy)
@@ -189,7 +192,7 @@ impl ContractInteract {
         let response = self
             .interactor
             .tx()
-            .from(&self.wallet_address)
+            .from(&self.proposer_address)
             .to(self.state.current_address())
             .gas(30_000_000u64)
             .typed(proxy::XBountyProxy)

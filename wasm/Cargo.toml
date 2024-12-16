@@ -5,7 +5,7 @@
 # ##########################################
 
 [package]
-name = "x-bounty-wasm"
+name = "x_bounty-wasm"
 version = "0.0.0"
 edition = "2021"
 publish = false
@@ -24,7 +24,7 @@ overflow-checks = false
 [profile.dev]
 panic = "abort"
 
-[dependencies.x-bounty]
+[dependencies.x_bounty]
 path = ".."
 
 [dependencies.multiversx-sc-wasm-adapter]

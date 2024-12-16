@@ -2,7 +2,7 @@ use multiversx_sc::derive_imports::*;
 use multiversx_sc::imports::*;
 
 #[type_abi]
-#[derive(TopEncode, TopDecode, NestedEncode, NestedDecode, PartialEq, Clone)]
+#[derive(TopEncode, TopDecode, NestedEncode, NestedDecode, PartialEq, Clone, Debug)]
 pub enum BountyStatus {
     Funded,
     Claimed,
@@ -10,7 +10,7 @@ pub enum BountyStatus {
 }
 
 #[type_abi]
-#[derive(TopEncode, TopDecode, NestedEncode, NestedDecode, Clone)]
+#[derive(TopEncode, TopDecode, NestedEncode, NestedDecode, Clone, Debug)]
 pub struct Bounty<M: ManagedTypeApi> {
     pub issue_id: u64,
     pub amount: BigUint<M>,

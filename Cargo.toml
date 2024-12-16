@@ -1,9 +1,9 @@
 [package]
-name = "x-bounty"
+name = "x_bounty"
 version = "0.0.0"
 publish = false
 edition = "2021"
-authors = ["you"]
+authors = ["costin.carabas@gmail.com"]
 
 [lib]
 path = "src/x_bounty.rs"
@@ -21,4 +21,5 @@ version = "0.54.6"
 members = [
     ".",
     "meta",
+    "interactor",
 ]

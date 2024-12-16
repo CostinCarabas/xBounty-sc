@@ -35,7 +35,7 @@ pub trait XBounty: events::EventsModule + storage::StorageModule {
         };
 
         require!(
-            !self.bounties(&issue_id).is_empty(),
+            self.bounties(&issue_id).is_empty(),
             "Bounty already exists for this issue"
         );
 
@@ -48,7 +48,10 @@ pub trait XBounty: events::EventsModule + storage::StorageModule {
     #[endpoint]
     fn claim(&self, issue_id: u64) {
         let caller = self.blockchain().get_caller();
-        require!(self.bounties(&issue_id).is_empty(), "Bounty does not exist");
+        require!(
+            !self.bounties(&issue_id).is_empty(),
+            "Bounty does not exist"
+        );
 
         let mut bounty = self.bounties(&issue_id).get();
         require!(
@@ -69,7 +72,10 @@ pub trait XBounty: events::EventsModule + storage::StorageModule {
     #[endpoint(releaseBounty)]
     fn release_bounty(&self, issue_id: u64) {
         let caller = self.blockchain().get_caller();
-        require!(self.bounties(&issue_id).is_empty(), "Bounty does not exist");
+        require!(
+            !self.bounties(&issue_id).is_empty(),
+            "Bounty does not exist"
+        );
 
         let bounty = self.bounties(&issue_id).get();
         require!(
