@@ -12,6 +12,7 @@ pub enum BountyStatus {
 #[type_abi]
 #[derive(TopEncode, TopDecode, NestedEncode, NestedDecode, Clone, Debug)]
 pub struct Bounty<M: ManagedTypeApi> {
+    pub repo_url: ManagedBuffer<M>,
     pub issue_id: u64,
     pub amount: BigUint<M>,
     pub proposer: ManagedAddress<M>,
@@ -24,5 +25,9 @@ pub struct Bounty<M: ManagedTypeApi> {
 pub trait StorageModule {
     #[view(getBountyIds)]
     #[storage_mapper("bounties")]
-    fn bounties(&self, issue_id: &u64) -> SingleValueMapper<Bounty<Self::Api>>;
+    fn bounties(
+        &self,
+        repo_url: &ManagedBuffer,
+        issue_id: &u64,
+    ) -> SingleValueMapper<Bounty<Self::Api>>;
 }

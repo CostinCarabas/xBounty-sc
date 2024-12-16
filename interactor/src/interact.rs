@@ -150,6 +150,7 @@ impl ContractInteract {
     pub async fn fund(&mut self) {
         let egld_amount = BigUint::<StaticApi>::from(10u128).pow(18);
 
+        let repo_url = ManagedBuffer::new_from_bytes(&b""[..]);
         let issue_id = 0u64;
 
         let response = self
@@ -159,7 +160,7 @@ impl ContractInteract {
             .to(self.state.current_address())
             .gas(30_000_000u64)
             .typed(proxy::XBountyProxy)
-            .fund(issue_id)
+            .fund(repo_url, issue_id)
             .egld(egld_amount)
             .returns(ReturnsResultUnmanaged)
             .run()
@@ -169,6 +170,7 @@ impl ContractInteract {
     }
 
     pub async fn claim(&mut self) {
+        let repo_url = ManagedBuffer::new_from_bytes(&b""[..]);
         let issue_id = 0u64;
 
         let response = self
@@ -178,7 +180,7 @@ impl ContractInteract {
             .to(self.state.current_address())
             .gas(30_000_000u64)
             .typed(proxy::XBountyProxy)
-            .claim(issue_id)
+            .claim(repo_url, issue_id)
             .returns(ReturnsResultUnmanaged)
             .run()
             .await;
@@ -187,6 +189,7 @@ impl ContractInteract {
     }
 
     pub async fn release_bounty(&mut self) {
+        let repo_url = ManagedBuffer::new_from_bytes(&b""[..]);
         let issue_id = 0u64;
 
         let response = self
@@ -196,7 +199,7 @@ impl ContractInteract {
             .to(self.state.current_address())
             .gas(30_000_000u64)
             .typed(proxy::XBountyProxy)
-            .release_bounty(issue_id)
+            .release_bounty(repo_url, issue_id)
             .returns(ReturnsResultUnmanaged)
             .run()
             .await;
@@ -205,6 +208,7 @@ impl ContractInteract {
     }
 
     pub async fn get_bounty(&mut self) {
+        let repo_url = ManagedBuffer::new_from_bytes(&b""[..]);
         let issue_id = 0u64;
 
         let result_value = self
@@ -212,7 +216,7 @@ impl ContractInteract {
             .query()
             .to(self.state.current_address())
             .typed(proxy::XBountyProxy)
-            .get_bounty(issue_id)
+            .get_bounty(repo_url, issue_id)
             .returns(ReturnsResultUnmanaged)
             .run()
             .await;
@@ -221,6 +225,7 @@ impl ContractInteract {
     }
 
     pub async fn bounties(&mut self) {
+        let repo_url = ManagedBuffer::new_from_bytes(&b""[..]);
         let issue_id = 0u64;
 
         let result_value = self
@@ -228,7 +233,7 @@ impl ContractInteract {
             .query()
             .to(self.state.current_address())
             .typed(proxy::XBountyProxy)
-            .bounties(issue_id)
+            .bounties(repo_url, issue_id)
             .returns(ReturnsResultUnmanaged)
             .run()
             .await;
