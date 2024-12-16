@@ -21,7 +21,7 @@ multiversx_sc_wasm_adapter::endpoints! {
         init => init
         upgrade => upgrade
         fund => fund
-        claim => claim
+        register => register
         releaseBounty => release_bounty
         getBounty => get_bounty
         getBountyIds => bounties

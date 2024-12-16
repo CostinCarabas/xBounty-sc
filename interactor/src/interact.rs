@@ -24,7 +24,7 @@ pub async fn x_bounty_cli() {
         "deploy" => interact.deploy().await,
         "upgrade" => interact.upgrade().await,
         "fund" => interact.fund().await,
-        "claim" => interact.claim().await,
+        "register" => interact.register().await,
         "releaseBounty" => interact.release_bounty().await,
         "getBounty" => interact.get_bounty().await,
         "getBountyIds" => interact.bounties().await,
@@ -149,7 +149,7 @@ impl ContractInteract {
 
         let repo_owner = ManagedBuffer::from("multiversx");
         let repo_url = ManagedBuffer::from("mx-contracts-rs");
-        let issue_id = 131u64;
+        let issue_id = 133u64;
 
         self.interactor
             .tx()
@@ -164,10 +164,11 @@ impl ContractInteract {
             .await;
     }
 
-    pub async fn claim(&mut self) {
-        let repo_owner = ManagedBuffer::new_from_bytes(&b""[..]);
-        let repo_url = ManagedBuffer::new_from_bytes(&b""[..]);
-        let issue_id = 0u64;
+    pub async fn register(&mut self) {
+        let repo_owner = ManagedBuffer::from("multiversx");
+        let repo_url = ManagedBuffer::from("mx-contracts-rs");
+        let issue_id = 133u64;
+        let github_id = ManagedBuffer::from("costincarabas");
 
         self.interactor
             .tx()
@@ -175,16 +176,17 @@ impl ContractInteract {
             .to(self.state.current_address())
             .gas(30_000_000u64)
             .typed(proxy::XBountyProxy)
-            .claim(repo_owner, repo_url, issue_id)
+            .register(repo_owner, repo_url, issue_id, github_id)
             .returns(ReturnsResultUnmanaged)
             .run()
             .await;
     }
 
     pub async fn release_bounty(&mut self) {
-        let repo_owner = ManagedBuffer::new_from_bytes(&b""[..]);
-        let repo_url = ManagedBuffer::new_from_bytes(&b""[..]);
-        let issue_id = 0u64;
+        let repo_owner = ManagedBuffer::from("multiversx");
+        let repo_url = ManagedBuffer::from("mx-contracts-rs");
+        let issue_id = 133u64;
+        let github_id = ManagedBuffer::from("costincarabas");
 
         self.interactor
             .tx()
@@ -192,7 +194,13 @@ impl ContractInteract {
             .to(self.state.current_address())
             .gas(30_000_000u64)
             .typed(proxy::XBountyProxy)
-            .release_bounty(repo_owner, repo_url, issue_id)
+            .release_bounty(
+                repo_owner,
+                repo_url,
+                issue_id,
+                self.solver_address.clone(),
+                github_id,
+            )
             .returns(ReturnsResultUnmanaged)
             .run()
             .await;

@@ -99,22 +99,25 @@ where
             .original_result()
     }
 
-    pub fn claim<
+    pub fn register<
         Arg0: ProxyArg<ManagedBuffer<Env::Api>>,
         Arg1: ProxyArg<ManagedBuffer<Env::Api>>,
         Arg2: ProxyArg<u64>,
+        Arg3: ProxyArg<ManagedBuffer<Env::Api>>,
     >(
         self,
         repo_owner: Arg0,
         repo_url: Arg1,
         issue_id: Arg2,
+        solver_github: Arg3,
     ) -> TxTypedCall<Env, From, To, NotPayable, Gas, ()> {
         self.wrapped_tx
             .payment(NotPayable)
-            .raw_call("claim")
+            .raw_call("register")
             .argument(&repo_owner)
             .argument(&repo_url)
             .argument(&issue_id)
+            .argument(&solver_github)
             .original_result()
     }
 
@@ -122,11 +125,15 @@ where
         Arg0: ProxyArg<ManagedBuffer<Env::Api>>,
         Arg1: ProxyArg<ManagedBuffer<Env::Api>>,
         Arg2: ProxyArg<u64>,
+        Arg3: ProxyArg<ManagedAddress<Env::Api>>,
+        Arg4: ProxyArg<ManagedBuffer<Env::Api>>,
     >(
         self,
         repo_owner: Arg0,
         repo_url: Arg1,
         issue_id: Arg2,
+        solver_addr: Arg3,
+        solver_github: Arg4,
     ) -> TxTypedCall<Env, From, To, NotPayable, Gas, ()> {
         self.wrapped_tx
             .payment(NotPayable)
@@ -134,6 +141,8 @@ where
             .argument(&repo_owner)
             .argument(&repo_url)
             .argument(&issue_id)
+            .argument(&solver_addr)
+            .argument(&solver_github)
             .original_result()
     }
 
@@ -187,15 +196,25 @@ where
     pub repo_owner: ManagedBuffer<Api>,
     pub amount: BigUint<Api>,
     pub proposer: ManagedAddress<Api>,
-    pub solver: Option<ManagedAddress<Api>>,
+    pub solvers: ManagedVec<Api, Solver<Api>>,
     pub status: BountyStatus,
     pub created_at: u64,
+}
+
+#[type_abi]
+#[derive(TopEncode, TopDecode, NestedEncode, NestedDecode, Clone, Debug, ManagedVecItem, PartialEq)]
+pub struct Solver<Api>
+where
+    Api: ManagedTypeApi,
+{
+    pub solver_addr: ManagedAddress<Api>,
+    pub solver_github: ManagedBuffer<Api>,
 }
 
 #[type_abi]
 #[derive(TopEncode, TopDecode, NestedEncode, NestedDecode, PartialEq, Clone, Debug)]
 pub enum BountyStatus {
     Funded,
-    Claimed,
+    Registered,
     Completed,
 }

@@ -2,10 +2,19 @@ use multiversx_sc::derive_imports::*;
 use multiversx_sc::imports::*;
 
 #[type_abi]
+#[derive(
+    TopEncode, TopDecode, NestedEncode, NestedDecode, Clone, Debug, ManagedVecItem, PartialEq,
+)]
+pub struct Solver<M: ManagedTypeApi> {
+    pub solver_addr: ManagedAddress<M>,
+    pub solver_github: ManagedBuffer<M>,
+}
+
+#[type_abi]
 #[derive(TopEncode, TopDecode, NestedEncode, NestedDecode, PartialEq, Clone, Debug)]
 pub enum BountyStatus {
     Funded,
-    Claimed,
+    Registered,
     Completed,
 }
 
@@ -17,7 +26,7 @@ pub struct Bounty<M: ManagedTypeApi> {
     pub repo_owner: ManagedBuffer<M>,
     pub amount: BigUint<M>,
     pub proposer: ManagedAddress<M>,
-    pub solver: Option<ManagedAddress<M>>,
+    pub solvers: ManagedVec<M, Solver<M>>,
     pub status: BountyStatus,
     pub created_at: u64,
 }
@@ -32,4 +41,7 @@ pub trait StorageModule {
         repo_url: &ManagedBuffer,
         issue_id: &u64,
     ) -> SingleValueMapper<Bounty<Self::Api>>;
+
+    #[storage_mapper("solvers")]
+    fn solvers(&self, solver_addr: &ManagedAddress) -> SingleValueMapper<ManagedBuffer<Self::Api>>;
 }
