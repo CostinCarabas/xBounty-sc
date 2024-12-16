@@ -130,8 +130,7 @@ impl ContractInteract {
     }
 
     pub async fn upgrade(&mut self) {
-        let response = self
-            .interactor
+        self.interactor
             .tx()
             .to(self.state.current_address())
             .from(&self.proposer_address)
@@ -143,72 +142,64 @@ impl ContractInteract {
             .returns(ReturnsNewAddress)
             .run()
             .await;
-
-        println!("Result: {response:?}");
     }
 
     pub async fn fund(&mut self) {
-        let egld_amount = BigUint::<StaticApi>::from(10u128).pow(18);
+        let egld_amount = BigUint::<StaticApi>::from(10u128).pow(17);
 
-        let repo_url =
-            ManagedBuffer::from("https://github.com/multiversx/mx-contracts-rs/issues/131");
-        let issue_id = 1u64;
+        let repo_owner = ManagedBuffer::from("multiversx");
+        let repo_url = ManagedBuffer::from("mx-contracts-rs");
+        let issue_id = 131u64;
 
-        let response = self
-            .interactor
+        self.interactor
             .tx()
             .from(&self.proposer_address)
             .to(self.state.current_address())
-            .gas(5_000_000u64)
+            .gas(30_000_000u64)
             .typed(proxy::XBountyProxy)
-            .fund(repo_url, issue_id)
+            .fund(repo_owner, repo_url, issue_id)
             .egld(egld_amount)
             .returns(ReturnsResultUnmanaged)
             .run()
             .await;
-
-        println!("Result: {response:?}");
     }
 
     pub async fn claim(&mut self) {
+        let repo_owner = ManagedBuffer::new_from_bytes(&b""[..]);
         let repo_url = ManagedBuffer::new_from_bytes(&b""[..]);
         let issue_id = 0u64;
 
-        let response = self
-            .interactor
+        self.interactor
             .tx()
             .from(&self.solver_address)
             .to(self.state.current_address())
             .gas(30_000_000u64)
             .typed(proxy::XBountyProxy)
-            .claim(repo_url, issue_id)
+            .claim(repo_owner, repo_url, issue_id)
             .returns(ReturnsResultUnmanaged)
             .run()
             .await;
-
-        println!("Result: {response:?}");
     }
 
     pub async fn release_bounty(&mut self) {
+        let repo_owner = ManagedBuffer::new_from_bytes(&b""[..]);
         let repo_url = ManagedBuffer::new_from_bytes(&b""[..]);
         let issue_id = 0u64;
 
-        let response = self
-            .interactor
+        self.interactor
             .tx()
             .from(&self.proposer_address)
             .to(self.state.current_address())
             .gas(30_000_000u64)
             .typed(proxy::XBountyProxy)
-            .release_bounty(repo_url, issue_id)
+            .release_bounty(repo_owner, repo_url, issue_id)
             .returns(ReturnsResultUnmanaged)
             .run()
             .await;
-
-        println!("Result: {response:?}");
     }
 
     pub async fn get_bounty(&mut self) {
+        let repo_owner = ManagedBuffer::new_from_bytes(&b""[..]);
         let repo_url = ManagedBuffer::new_from_bytes(&b""[..]);
         let issue_id = 0u64;
 
@@ -217,7 +208,7 @@ impl ContractInteract {
             .query()
             .to(self.state.current_address())
             .typed(proxy::XBountyProxy)
-            .get_bounty(repo_url, issue_id)
+            .get_bounty(repo_owner, repo_url, issue_id)
             .returns(ReturnsResultUnmanaged)
             .run()
             .await;
@@ -226,6 +217,7 @@ impl ContractInteract {
     }
 
     pub async fn bounties(&mut self) {
+        let repo_owner = ManagedBuffer::new_from_bytes(&b""[..]);
         let repo_url = ManagedBuffer::new_from_bytes(&b""[..]);
         let issue_id = 0u64;
 
@@ -234,7 +226,7 @@ impl ContractInteract {
             .query()
             .to(self.state.current_address())
             .typed(proxy::XBountyProxy)
-            .bounties(repo_url, issue_id)
+            .bounties(repo_owner, repo_url, issue_id)
             .returns(ReturnsResultUnmanaged)
             .run()
             .await;

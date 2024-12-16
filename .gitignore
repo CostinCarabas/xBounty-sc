@@ -14,7 +14,7 @@ framework/**/Cargo.lock
 sdk/**/Cargo.lock
 tools/**/Cargo.lock
 vm/**/Cargo.lock
-
+.DS_Store
 
 
 # Coverage outputs

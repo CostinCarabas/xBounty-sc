@@ -18,11 +18,11 @@ pub trait XBounty: events::EventsModule + storage::StorageModule {
 
     #[payable("EGLD")]
     #[endpoint]
-    fn fund(&self, repo_url: ManagedBuffer, issue_id: u64) {
+    fn fund(&self, repo_owner: ManagedBuffer, repo_url: ManagedBuffer, issue_id: u64) {
         let payment_amount = self.call_value().egld_value().clone_value();
         require!(payment_amount > 0, "Payment amount must be greater than 0");
 
-        let bounties_mapper = self.bounties(&repo_url, &issue_id);
+        let bounties_mapper = self.bounties(&repo_owner, &repo_url, &issue_id);
 
         require!(
             bounties_mapper.is_empty(),
@@ -35,6 +35,7 @@ pub trait XBounty: events::EventsModule + storage::StorageModule {
         let bounty = Bounty {
             repo_url: repo_url.clone(),
             issue_id,
+            repo_owner,
             amount: payment_amount.clone(),
             proposer: caller.clone(),
             solver: None,
@@ -49,9 +50,9 @@ pub trait XBounty: events::EventsModule + storage::StorageModule {
     }
 
     #[endpoint]
-    fn claim(&self, repo_url: ManagedBuffer, issue_id: u64) {
+    fn claim(&self, repo_owner: ManagedBuffer, repo_url: ManagedBuffer, issue_id: u64) {
         let caller = self.blockchain().get_caller();
-        let bounties_mapper = self.bounties(&repo_url, &issue_id);
+        let bounties_mapper = self.bounties(&repo_owner, &repo_url, &issue_id);
         require!(!bounties_mapper.is_empty(), "Bounty does not exist");
 
         let mut bounty = bounties_mapper.get();
@@ -71,8 +72,8 @@ pub trait XBounty: events::EventsModule + storage::StorageModule {
     }
 
     #[endpoint(releaseBounty)]
-    fn release_bounty(&self, repo_url: ManagedBuffer, issue_id: u64) {
-        let bounties_mapper = self.bounties(&repo_url, &issue_id);
+    fn release_bounty(&self, repo_owner: ManagedBuffer, repo_url: ManagedBuffer, issue_id: u64) {
+        let bounties_mapper = self.bounties(&repo_owner, &repo_url, &issue_id);
         require!(!bounties_mapper.is_empty(), "Bounty does not exist");
 
         let bounty = bounties_mapper.get();
@@ -105,11 +106,17 @@ pub trait XBounty: events::EventsModule + storage::StorageModule {
     // Views
 
     #[view(getBounty)]
-    fn get_bounty(&self, repo_url: ManagedBuffer, issue_id: u64) -> Option<Bounty<Self::Api>> {
-        if self.bounties(&repo_url, &issue_id).is_empty() {
+    fn get_bounty(
+        &self,
+        repo_owner: ManagedBuffer,
+        repo_url: ManagedBuffer,
+        issue_id: u64,
+    ) -> Option<Bounty<Self::Api>> {
+        let bounties_mapper = self.bounties(&repo_owner, &repo_url, &issue_id);
+        if bounties_mapper.is_empty() {
             None
         } else {
-            Some(self.bounties(&repo_url, &issue_id).get())
+            Some(bounties_mapper.get())
         }
     }
 }

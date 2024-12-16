@@ -83,14 +83,17 @@ where
 {
     pub fn fund<
         Arg0: ProxyArg<ManagedBuffer<Env::Api>>,
-        Arg1: ProxyArg<u64>,
+        Arg1: ProxyArg<ManagedBuffer<Env::Api>>,
+        Arg2: ProxyArg<u64>,
     >(
         self,
-        repo_url: Arg0,
-        issue_id: Arg1,
+        repo_owner: Arg0,
+        repo_url: Arg1,
+        issue_id: Arg2,
     ) -> TxTypedCall<Env, From, To, (), Gas, ()> {
         self.wrapped_tx
             .raw_call("fund")
+            .argument(&repo_owner)
             .argument(&repo_url)
             .argument(&issue_id)
             .original_result()
@@ -98,15 +101,18 @@ where
 
     pub fn claim<
         Arg0: ProxyArg<ManagedBuffer<Env::Api>>,
-        Arg1: ProxyArg<u64>,
+        Arg1: ProxyArg<ManagedBuffer<Env::Api>>,
+        Arg2: ProxyArg<u64>,
     >(
         self,
-        repo_url: Arg0,
-        issue_id: Arg1,
+        repo_owner: Arg0,
+        repo_url: Arg1,
+        issue_id: Arg2,
     ) -> TxTypedCall<Env, From, To, NotPayable, Gas, ()> {
         self.wrapped_tx
             .payment(NotPayable)
             .raw_call("claim")
+            .argument(&repo_owner)
             .argument(&repo_url)
             .argument(&issue_id)
             .original_result()
@@ -114,15 +120,18 @@ where
 
     pub fn release_bounty<
         Arg0: ProxyArg<ManagedBuffer<Env::Api>>,
-        Arg1: ProxyArg<u64>,
+        Arg1: ProxyArg<ManagedBuffer<Env::Api>>,
+        Arg2: ProxyArg<u64>,
     >(
         self,
-        repo_url: Arg0,
-        issue_id: Arg1,
+        repo_owner: Arg0,
+        repo_url: Arg1,
+        issue_id: Arg2,
     ) -> TxTypedCall<Env, From, To, NotPayable, Gas, ()> {
         self.wrapped_tx
             .payment(NotPayable)
             .raw_call("releaseBounty")
+            .argument(&repo_owner)
             .argument(&repo_url)
             .argument(&issue_id)
             .original_result()
@@ -130,15 +139,18 @@ where
 
     pub fn get_bounty<
         Arg0: ProxyArg<ManagedBuffer<Env::Api>>,
-        Arg1: ProxyArg<u64>,
+        Arg1: ProxyArg<ManagedBuffer<Env::Api>>,
+        Arg2: ProxyArg<u64>,
     >(
         self,
-        repo_url: Arg0,
-        issue_id: Arg1,
+        repo_owner: Arg0,
+        repo_url: Arg1,
+        issue_id: Arg2,
     ) -> TxTypedCall<Env, From, To, NotPayable, Gas, Option<Bounty<Env::Api>>> {
         self.wrapped_tx
             .payment(NotPayable)
             .raw_call("getBounty")
+            .argument(&repo_owner)
             .argument(&repo_url)
             .argument(&issue_id)
             .original_result()
@@ -146,15 +158,18 @@ where
 
     pub fn bounties<
         Arg0: ProxyArg<ManagedBuffer<Env::Api>>,
-        Arg1: ProxyArg<u64>,
+        Arg1: ProxyArg<ManagedBuffer<Env::Api>>,
+        Arg2: ProxyArg<u64>,
     >(
         self,
-        repo_url: Arg0,
-        issue_id: Arg1,
+        repo_owner: Arg0,
+        repo_url: Arg1,
+        issue_id: Arg2,
     ) -> TxTypedCall<Env, From, To, NotPayable, Gas, Bounty<Env::Api>> {
         self.wrapped_tx
             .payment(NotPayable)
             .raw_call("getBountyIds")
+            .argument(&repo_owner)
             .argument(&repo_url)
             .argument(&issue_id)
             .original_result()
@@ -169,6 +184,7 @@ where
 {
     pub repo_url: ManagedBuffer<Api>,
     pub issue_id: u64,
+    pub repo_owner: ManagedBuffer<Api>,
     pub amount: BigUint<Api>,
     pub proposer: ManagedAddress<Api>,
     pub solver: Option<ManagedAddress<Api>>,
