@@ -9,6 +9,8 @@ use storage::Solver;
 mod events;
 mod storage;
 
+pub const TIMESTAMP_IN_30_DAYS: u64 = 60 * 60 * 24 * 30;
+
 #[multiversx_sc::contract]
 pub trait XBounty: events::EventsModule + storage::StorageModule {
     #[init]
@@ -48,6 +50,29 @@ pub trait XBounty: events::EventsModule + storage::StorageModule {
 
         // Emit event for funding
         self.fund_event(repo_owner, repo_url, issue_id, payment_amount, caller);
+    }
+
+    #[endpoint(cancelBounty)]
+    fn cancel_bounty(&self, repo_owner: ManagedBuffer, repo_url: ManagedBuffer, issue_id: u64) {
+        let bounties_mapper = self.bounties(&repo_owner, &repo_url, &issue_id);
+        require!(!bounties_mapper.is_empty(), "Bounty does not exist");
+
+        let bounty = bounties_mapper.get();
+
+        let caller = self.blockchain().get_caller();
+        require!(
+            bounty.proposer == caller,
+            "Only proposer can cancel the bounty"
+        );
+
+        let block_timestamp = self.blockchain().get_block_timestamp();
+
+        require!(
+            block_timestamp > bounty.created_at + TIMESTAMP_IN_30_DAYS,
+            "Cancel may be performed after a 30 days delay"
+        );
+
+        self.send().direct_egld(&caller, &bounty.amount);
     }
 
     #[endpoint]
